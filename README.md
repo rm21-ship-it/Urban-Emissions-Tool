@@ -17,9 +17,12 @@ streamlit run app_FINAL.py
 
 Users enter a city's **current** and **future** conditions — population, urban area, and EV share — and the app calculates:
 
-- **VKT (Vehicle Kilometres Travelled):** baseline and future totals and per-capita figures
-- **CO₂e Emissions:** total and per-capita, broken down by densification effect vs. EV adoption effect
-- **Real-World Equivalencies:** cars removed from roads, trees needed to offset, and social cost savings in USD
+- **VKT (Vehicle Kilometres Travelled) — per capita:** baseline and future per-person figures and the change
+- **CO₂e Emissions — per capita:** baseline and future kg CO₂e per person and the change
+- **Savings Breakdown:** per-capita-adjusted total savings split into densification vs. EV adoption effects (see Methodology below)
+- **Real-World Equivalencies:** cars removed from roads, trees needed to offset, and social cost savings in USD — all based on per-capita-adjusted savings
+
+> **Why per-capita only?** Showing total emissions can make growing cities look worse even when they're becoming more efficient per person. Since restricting growth in one city just pushes it elsewhere, the tool focuses on per-capita efficiency — the metric that reflects compact urban form performance.
 
 ---
 
@@ -141,12 +144,30 @@ EV_frac = EV share / 100
 
 Grid carbon intensities are hardcoded in `GRID_INTENSITY` (sourced from Ember GER 2024–2025 and IEA 2025) because they come from an external source and update independently of the VKT model pipeline.
 
+### Per-Capita-Adjusted Savings
+
+Results are reported in per-capita terms only (total VKT and total emissions rows are intentionally excluded). The savings breakdown uses a **per-capita-adjusted** approach that answers: *"how much less does the future compact city emit compared to a city of the same future size but with today's per-capita inefficiency?"*
+
+```
+dem_adjusted = (em_baseline_per_capita − em_future_per_capita) × future_population
+
+where:
+  em_baseline_per_capita = total_baseline_emissions / current_population
+  em_future_per_capita   = total_future_emissions   / future_population
+```
+
+This avoids penalising city growth: a city that grows its population while improving per-capita efficiency will show positive savings, because the comparison baseline is "a city of that same future size but as inefficient as today."
+
 ### Savings Breakdown
 
-The total emission delta is decomposed into two independent effects:
+The per-capita-adjusted total is decomposed into two effects:
 
-- **Densification effect** — emission change from VKT change alone, holding EV share constant at the current level
-- **EV adoption effect** — emission change from the shift in EV share alone, applied to the future VKT
+- **Densification effect** = `(em_baseline_per_cap − em_counterfactual_per_cap) × future_pop`
+  where `em_counterfactual` = emissions using future VKT but current EV share (isolates VKT change)
+- **EV adoption effect** = `(em_counterfactual_per_cap − em_future_per_cap) × future_pop`
+  (isolates the shift in EV share at fixed future VKT)
+
+Both effects sum to `dem_adjusted`. Real-world equivalencies (cars, trees, social cost) all reflect `dem_adjusted`.
 
 ---
 
@@ -201,7 +222,8 @@ The density change summary (Δ population, Δ area, Δ density) is displayed liv
 
 ## File History
 
-| Version | Key Change |
-|---------|-----------|
-| app_FINAL.py (v3) | `ln_density` replaces `ln_area` as predictor; density computed internally from user inputs; `city_emission_intensity.json` added; dual current/future input architecture |
-| Previous | `ln_area` predictor (VIF = 3.8); single population snapshot; country-level EI only |
+| Version | Key Changes |
+|---------|------------|
+| app_FINAL_v4.py (current) | Per-capita-only display (totals removed); per-capita-adjusted savings breakdown and equivalencies; `ln_density` predictor |
+| app_FINAL_new.py (v3) | `ln_density` replaces `ln_area` as predictor; density computed internally; `city_emission_intensity.json` added; dual current/future input architecture |
+| app_FINAL.py (v2) | `ln_area` predictor (VIF = 3.8); single population snapshot; country-level EI only |

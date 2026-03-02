@@ -1,12 +1,22 @@
 """
-VKT to Emissions Web Tool — Streamlit App (FINAL v3 — DENSITY MODEL)
+VKT to Emissions Web Tool — Streamlit App (FINAL v4 — DENSITY MODEL + PER-CAPITA FOCUS)
 All model parameters loaded from JSON files exported by aligned pipeline.
 Only GRID_INTENSITY hardcoded (external source: Ember/IEA).
 
-KEY CHANGE: ln_area replaced with ln_density = ln(pop/area) as model predictor.
-  - Coefficients JSON now contains ln_density_S/M/L instead of ln_area_S/M/L
-  - predict_vkt() computes density internally from user-supplied pop + area
-  - User inputs are UNCHANGED (still population + area in km²)
+KEY CHANGES vs. v3:
+  1. DENSITY MODEL: ln_area replaced with ln_density = ln(pop/area) as model predictor.
+     - Coefficients JSON now contains ln_density_S/M/L instead of ln_area_S/M/L
+     - predict_vkt() computes density internally from user-supplied pop + area
+     - User inputs are UNCHANGED (still population + area in km²)
+
+  2. PER-CAPITA FOCUS: Total VKT and total emissions rows removed from results display.
+     - Only per-capita VKT and per-capita CO₂e are shown (avoids penalising city growth)
+
+  3. PER-CAPITA-ADJUSTED SAVINGS BREAKDOWN:
+     - dem_adjusted = (baseline_em_per_capita − future_em_per_capita) × future_population
+     - This compares: "future city at baseline per-capita inefficiency" vs actual future city
+     - Densification and EV effects both computed on the same per-capita-adjusted basis
+     - Real-world equivalencies (cars, trees, social cost) reflect dem_adjusted
 
 CANONICAL MODEL EQUATION:
   ln(VKT_i) = β₀ + β₁·ln(pop_i) + β₂·ln(density_i)
@@ -20,7 +30,7 @@ Required files (same directory):
   - country_emission_intensity.json
   - city_emission_intensity.json (optional)
 
-To run: pip install streamlit numpy && streamlit run app_FINAL.py
+To run: pip install streamlit numpy && streamlit run app_FINAL_v4.py
 """
 
 import streamlit as st
@@ -495,9 +505,21 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
     dem = em_c - em_f
     dem_p = dem / em_c * 100 if em_c > 0 else 0
 
+    # Per-capita-adjusted savings:
+    # Answers "how much less does the future compact city emit compared to a city
+    # of the same future size but with today's (baseline) per-capita inefficiency?"
+    # dem_adjusted = (baseline_em_per_capita × future_pop) − future_total_emissions
+    em_c_per_cap = em_c / pop_cur          # tonnes CO₂e per person (baseline)
+    em_f_per_cap = em_f / pop_fut          # tonnes CO₂e per person (future)
+    dem_adjusted = (em_c_per_cap - em_f_per_cap) * pop_fut
+
+    # Breakdown using same per-capita logic, holding EV share at current to isolate effects
     em_vo, _, _ = calc_emissions(vkt_f, ei_val, country, ev_cur)
-    vkt_eff = em_c - em_vo
-    ev_eff = em_vo - em_f
+    em_vo_per_cap = em_vo / pop_fut
+    # Densification saves by reducing VKT per capita (EV share held constant)
+    vkt_eff = (em_c_per_cap - em_vo_per_cap) * pop_fut
+    # EV adoption saves by cleaning the fleet (VKT held at future level)
+    ev_eff = (em_vo_per_cap - em_f_per_cap) * pop_fut
 
     # ── Results Banner ──
     st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
@@ -508,27 +530,13 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
         f'</div>',
         unsafe_allow_html=True)
 
-    # ── VKT Section ──
-    st.markdown('<div class="section-header">🚗 Vehicle Kilometres Travelled (VKT)</div>',
+    # ── VKT Section (per capita only) ──
+    st.markdown('<div class="section-header">🚗 Vehicle Kilometres Travelled — Per Capita</div>',
                 unsafe_allow_html=True)
 
     vpc_c = vkt_c / pop_cur
     vpc_f = vkt_f / pop_fut
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.metric("🔵 Baseline Total", f"{vkt_c / 1e9:.2f} billion km/year")
-    with c2:
-        st.metric("🟢 Future Total", f"{vkt_f / 1e9:.2f} billion km/year")
-    with c3:
-        if dvkt >= 0:
-            st.metric("✅ Reduction", f"{dvkt / 1e6:,.0f} million km/year",
-                      f"-{dvkt_p:.1f}%", delta_color="inverse")
-        else:
-            st.metric("⬆️ Increase", f"{-dvkt / 1e6:,.0f} million km/year",
-                      f"+{-dvkt_p:.1f}%", delta_color="inverse")
-
-    st.markdown("**Per Capita:**")
     c1, c2, c3 = st.columns(3)
     with c1:
         st.metric("🔵 Baseline", f"{vpc_c:,.0f} km per person per year")
@@ -537,30 +545,16 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
     with c3:
         vpc_change = vpc_f - vpc_c
         vpc_change_p = vpc_change / vpc_c * 100
-        st.metric("📉 Change", f"{vpc_change:,.0f} km per person per year",
+        st.metric("📉 Change per Person", f"{vpc_change:,.0f} km per person per year",
                   f"{vpc_change_p:+.1f}%", delta_color="inverse")
 
-    # ── Emissions Section ──
+    # ── Emissions Section (per capita only) ──
     st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
-    st.markdown('<div class="section-header">🌍 CO₂e Emissions</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">🌍 CO₂e Emissions — Per Capita</div>', unsafe_allow_html=True)
 
     epc_c = em_c * 1000 / pop_cur
     epc_f = em_f * 1000 / pop_fut
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.metric("🔵 Baseline Total", f"{em_c:,.0f} tonnes CO₂e/year")
-    with c2:
-        st.metric("🟢 Future Total", f"{em_f:,.0f} tonnes CO₂e/year")
-    with c3:
-        if dem >= 0:
-            st.metric("✅ Savings", f"{dem:,.0f} tonnes CO₂e/year",
-                      f"-{dem_p:.1f}%", delta_color="inverse")
-        else:
-            st.metric("⬆️ Increase", f"{-dem:,.0f} tonnes CO₂e/year",
-                      f"+{-dem_p:.1f}%", delta_color="inverse")
-
-    st.markdown("**Per Capita:**")
     c1, c2, c3 = st.columns(3)
     with c1:
         st.metric("🔵 Baseline", f"{epc_c:,.0f} kg CO₂e per person per year")
@@ -569,18 +563,18 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
     with c3:
         epc_change = epc_f - epc_c
         epc_change_p = epc_change / epc_c * 100
-        st.metric("📉 Change", f"{epc_change:,.0f} kg CO₂e per person per year",
+        st.metric("📉 Change per Person", f"{epc_change:,.0f} kg CO₂e per person per year",
                   f"{epc_change_p:+.1f}%", delta_color="inverse")
 
     # ── Breakdown ──
-    st.markdown("**Savings Breakdown:**")
+    st.markdown("**Savings Breakdown** *(vs. a city of future size but baseline per-capita efficiency):*")
     c1, c2 = st.columns(2)
     with c1:
         if vkt_eff >= 0:
             st.markdown(
                 f'<div class="breakdown-card breakdown-saved">'
                 f'<span style="font-size:1.5rem">🏙️</span>'
-                f'<div><b>Densification Effect (VKT reduction)</b><br>'
+                f'<div><b>Densification Effect (VKT per capita reduction)</b><br>'
                 f'<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem">'
                 f'{vkt_eff:,.0f}</span> tonnes CO₂e saved per year</div>'
                 f'</div>', unsafe_allow_html=True)
@@ -588,7 +582,7 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
             st.markdown(
                 f'<div class="breakdown-card breakdown-added">'
                 f'<span style="font-size:1.5rem">🏙️</span>'
-                f'<div><b>Densification Effect (VKT change)</b><br>'
+                f'<div><b>Densification Effect (VKT per capita change)</b><br>'
                 f'<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem">'
                 f'{-vkt_eff:,.0f}</span> tonnes CO₂e added per year</div>'
                 f'</div>', unsafe_allow_html=True)
@@ -610,32 +604,32 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
                 f'{-ev_eff:,.0f}</span> tonnes CO₂e added per year</div>'
                 f'</div>', unsafe_allow_html=True)
 
-    # ── Equivalencies ──
+    # ── Equivalencies — based on per-capita-adjusted savings ──
     st.markdown('<hr class="styled-divider">', unsafe_allow_html=True)
     st.markdown('<div class="section-header">🌳 Real-World Equivalencies</div>', unsafe_allow_html=True)
 
-    cars = dem / TONNES_PER_CAR
-    trees = dem / TONNES_PER_TREE
-    cost = dem * SOCIAL_COST
+    cars = dem_adjusted / TONNES_PER_CAR
+    trees = dem_adjusted / TONNES_PER_TREE
+    cost = dem_adjusted * SOCIAL_COST
 
-    card_class = "equiv-card-green" if dem >= 0 else "equiv-card-red"
-    sign = "" if dem >= 0 else "-"
+    card_class = "equiv-card-green" if dem_adjusted >= 0 else "equiv-card-red"
+    sign = "" if dem_adjusted >= 0 else "-"
     abs_cars = abs(cars)
     abs_trees = abs(trees)
     abs_cost = abs(cost)
 
-    cars_label = "cars removed from roads per year" if dem >= 0 else "additional car-equivalents per year"
+    cars_label = "cars removed from roads per year" if dem_adjusted >= 0 else "additional car-equivalents per year"
     if abs_trees >= 1e6:
         trees_str = f"{sign}{abs_trees / 1e6:.1f} million"
     else:
         trees_str = f"{sign}{abs_trees:,.0f}"
-    trees_label = "trees (1-year carbon offset)" if dem >= 0 else "trees needed to offset increase"
+    trees_label = "trees (1-year carbon offset)" if dem_adjusted >= 0 else "trees needed to offset increase"
 
     if abs_cost >= 1e6:
         cost_str = f"{sign}${abs_cost / 1e6:.1f} million USD"
     else:
         cost_str = f"{sign}${abs_cost:,.0f} USD"
-    cost_label = "social cost savings per year" if dem >= 0 else "social cost increase per year"
+    cost_label = "social cost savings per year" if dem_adjusted >= 0 else "social cost increase per year"
 
     c1, c2, c3 = st.columns(3)
     with c1:
