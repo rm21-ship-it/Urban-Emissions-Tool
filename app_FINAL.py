@@ -497,13 +497,9 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
     # ── Compute ──
     vkt_c = predict_vkt(pop_cur, area_cur, country)
     vkt_f = predict_vkt(pop_fut, area_fut, country)
-    dvkt = vkt_c - vkt_f
-    dvkt_p = dvkt / vkt_c * 100 if vkt_c > 0 else 0
 
     em_c, _, _ = calc_emissions(vkt_c, ei_val, country, ev_cur)
     em_f, _, _ = calc_emissions(vkt_f, ei_val, country, ev_fut)
-    dem = em_c - em_f
-    dem_p = dem / em_c * 100 if em_c > 0 else 0
 
     # Per-capita-adjusted savings:
     # Answers "how much less does the future compact city emit compared to a city
@@ -531,7 +527,7 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
         unsafe_allow_html=True)
 
     # ── VKT Section (per capita only) ──
-    st.markdown('<div class="section-header">🚗 Vehicle Kilometres Travelled — Per Capita</div>',
+    st.markdown('<div class="section-header">🚗 Vehicle Kilometres Travelled (VKT) — Per Capita</div>',
                 unsafe_allow_html=True)
 
     vpc_c = vkt_c / pop_cur
@@ -567,14 +563,18 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
                   f"{epc_change_p:+.1f}%", delta_color="inverse")
 
     # ── Breakdown ──
-    st.markdown("**Savings Breakdown** *(vs. a city of future size but baseline per-capita efficiency):*")
+    st.markdown("**Savings Breakdown:**")
+    st.markdown(
+        '<p style="font-size:0.88rem;color:#6c757d;margin:-0.3rem 0 0.8rem 0;">'
+        'Compared to a future city as sprawling as today but scaled to the future population.</p>',
+        unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         if vkt_eff >= 0:
             st.markdown(
                 f'<div class="breakdown-card breakdown-saved">'
                 f'<span style="font-size:1.5rem">🏙️</span>'
-                f'<div><b>Densification Effect (VKT per capita reduction)</b><br>'
+                f'<div><b>Densification Effect (VKT efficiency)</b><br>'
                 f'<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem">'
                 f'{vkt_eff:,.0f}</span> tonnes CO₂e saved per year</div>'
                 f'</div>', unsafe_allow_html=True)
@@ -582,7 +582,7 @@ if st.button("🔢  Calculate Emissions Savings", type="primary", use_container_
             st.markdown(
                 f'<div class="breakdown-card breakdown-added">'
                 f'<span style="font-size:1.5rem">🏙️</span>'
-                f'<div><b>Densification Effect (VKT per capita change)</b><br>'
+                f'<div><b>Densification Effect (VKT efficiency)</b><br>'
                 f'<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem">'
                 f'{-vkt_eff:,.0f}</span> tonnes CO₂e added per year</div>'
                 f'</div>', unsafe_allow_html=True)
