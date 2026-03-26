@@ -55,7 +55,6 @@ where `density_i = population_i / area_km2_i` (people per km²)
 ### Key Design Choices
 
 - **WLS with inverse-population weights** — prevents megacities from dominating the loss function; ensures good fit across all city sizes
-- **ln_density replaces ln_area** — eliminates multicollinearity between the two continuous predictors (VIF: 3.8 → 1.0, predictor correlation: r = 0.857 → r = 0.153). Predictions are mathematically identical to the old ln_area spec; only coefficient interpretability improves
 - **Country fixed effects** — 99 countries, Afghanistan as reference (δ = 0). 90 of 98 estimated effects are statistically significant (p < 0.05)
 - **Size-band interactions** — each band (Small / Medium / Large) gets its own population and density elasticity
 
@@ -219,11 +218,3 @@ The density change summary (Δ population, Δ area, Δ density) is displayed liv
 - **No land use or modal shift modelling.** The density effect captures the empirical relationship between urban compactness and total VKT. It does not separately model walking, cycling, or transit mode share.
 
 ---
-
-## File History
-
-| Version | Key Changes |
-|---------|------------|
-| app_FINAL_v4.py (current) | Per-capita-only display (totals removed); per-capita-adjusted savings breakdown and equivalencies; `ln_density` predictor |
-| app_FINAL_new.py (v3) | `ln_density` replaces `ln_area` as predictor; density computed internally; `city_emission_intensity.json` added; dual current/future input architecture |
-| app_FINAL.py (v2) | `ln_area` predictor (VIF = 3.8); single population snapshot; country-level EI only |
