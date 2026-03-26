@@ -380,7 +380,6 @@ c = VKT_MODEL_COEFFICIENTS
 with st.expander("ℹ️  About the Model & Data Sources"):
     st.markdown(f"""
 **Model:** Weighted Least Squares + Country Fixed Effects + Size-Band Interactions  
-**Predictor fix:** ln_density = ln(pop/area) replaces ln_area — eliminates multicollinearity (VIF: 3.8 → 1.0)  
 **Performance:** Test R² = 0.7848 | Bias = +2.28% | 8,396 cities across 99 countries
 
 | Band | Population β | Density β | Interpretation |
