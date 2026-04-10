@@ -12,5 +12,5 @@ jobs:
       - name: Ping Streamlit App
         run: |
           echo "Pinging Streamlit app..."
-          curl -s -o /dev/null -w "%{http_code}" https://urban-emissions-tool.streamlit.app
+          curl -s -o /dev/null -w "%{http_code}\n" https://urban-emissions-tool.streamlit.app
           echo "Ping complete"
