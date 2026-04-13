@@ -456,7 +456,6 @@ st.markdown("""
   </div>
 
   <p class="disc-footer">
-    
     For factors influencing driving, see Appendix R1 &nbsp;&#183;&nbsp;
     Detailed methods about how the tool was created and calibrated can be found in a soon-to-be-published journal article.
   </p>
