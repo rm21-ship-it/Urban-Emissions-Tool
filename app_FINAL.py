@@ -369,6 +369,7 @@ st.markdown("""
 <div class="main-header">
     <h1>🌍 Urban Emissions Savings Calculator</h1>
     <p>Estimate CO₂e reductions from urban densification and electric vehicle adoption</p>
+    <p>This calculator is an estimation tool that uses population density as a coarse proxy for compact urban form and the factors that reduce driving (measured as vehicles kilometers traveled). For information about the factors that influence driving see appendix R1. Detailed methods about how the tool was created and calibrated can be found in a soon to be published journal article. This tool is not intended to replace more accurate and sophisticated models of road transportation but rather provide rough estimates for minimal effort. The maximum window of estimation suggested is 30 years and estimates are expected to be +/- 20%. The % difference of estimates will be higher when cities are uncharacteristic for what is typical of a given country such as New York in the U.S. Using population density as a coarse proxy is expected to capture changes in driving due to reduced trip length and modal shift (choosing other forms of transportation besides driving). The model does not consider other relevant variables such as how wealth influences car ownership or how road constructing is funded. The model then can be understood to assess the possible changes in private transportation from compact urban form ‘all else being equal’.</p>
 </div>
 """, unsafe_allow_html=True)
 
