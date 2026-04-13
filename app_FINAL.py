@@ -1,4 +1,3 @@
--*- coding: utf-8 -*-
 """
 VKT to Emissions Web Tool — Streamlit App (FINAL v4 — DENSITY MODEL + PER-CAPITA FOCUS)
 All model parameters loaded from JSON files exported by aligned pipeline.
@@ -366,10 +365,6 @@ st.markdown("""
 # HEADER
 # ═══════════════════════════════════════════════════════════════════════════════
 
-st.markdown("""
-<div class="main-header">
-    <h1>🌍 Urban Emissions Savings Calculator</h1>
-    <p>Estimate CO₂e reductions from urban densification and electric vehicle adoption</p>
     st.markdown("""
 <div class="main-header">
     <h1>🌍 Urban Emissions Savings Calculator</h1>
