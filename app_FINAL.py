@@ -450,8 +450,7 @@ st.markdown("""
     </div>
     <div class="disc-card" style="border-left: 3px solid #D85A30;">
       <p class="disc-card-label">What the model omits</p>
-      <p class="disc-card-body">Wealth, car ownership, and road funding are excluded. Results
-      reflect compact form <em>all else being equal</em>.</p>
+      <p class="disc-card-body">Factors that may affect driving such as wealth, car ownership, and road funding are excluded. Results reflect compact form <em>all else being equal</em>.</p>
     </div>
   </div>
 
