@@ -365,7 +365,7 @@ st.markdown("""
 # HEADER
 # ═══════════════════════════════════════════════════════════════════════════════
 
-    st.markdown("""
+st.markdown("""
 <div class="main-header">
     <h1>🌍 Urban Emissions Savings Calculator</h1>
     <p>Estimate CO₂e reductions from urban densification and electric vehicle adoption</p>
