@@ -457,7 +457,7 @@ st.markdown("""
 
   <p class="disc-footer">
     For factors influencing driving, see Appendix R1 &nbsp;&#183;&nbsp;
-    Full methodology in a forthcoming journal article
+    Full methodology and calibration details will appear in an upcoming journal publication.
   </p>
 </div>
 """, unsafe_allow_html=True)
