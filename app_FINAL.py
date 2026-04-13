@@ -369,7 +369,72 @@ st.markdown("""
 <div class="main-header">
     <h1>🌍 Urban Emissions Savings Calculator</h1>
     <p>Estimate CO₂e reductions from urban densification and electric vehicle adoption</p>
-    <p>This calculator is an estimation tool that uses population density as a coarse proxy for compact urban form and the factors that reduce driving (measured as vehicles kilometers traveled). For information about the factors that influence driving see appendix R1. Detailed methods about how the tool was created and calibrated can be found in a soon to be published journal article. This tool is not intended to replace more accurate and sophisticated models of road transportation but rather provide rough estimates for minimal effort. The maximum window of estimation suggested is 30 years and estimates are expected to be +/- 20%. The % difference of estimates will be higher when cities are uncharacteristic for what is typical of a given country such as New York in the U.S. Using population density as a coarse proxy is expected to capture changes in driving due to reduced trip length and modal shift (choosing other forms of transportation besides driving). The model does not consider other relevant variables such as how wealth influences car ownership or how road constructing is funded. The model then can be understood to assess the possible changes in private transportation from compact urban form ‘all else being equal’.</p>
+    st.markdown("""
+<div class="main-header">
+    <h1>🌍 Urban Emissions Savings Calculator</h1>
+    <p>Estimate CO₂e reductions from urban densification and electric vehicle adoption</p>
+</div>
+
+<div style="margin: 1rem 0 1.5rem;">
+
+  <div style="background: #f0f4f8; border-radius: 10px; padding: 0.9rem 1.2rem; margin-bottom: 1rem;
+              display: flex; align-items: flex-start; gap: 12px; border: 1px solid #d8e2ec;">
+    <span style="font-size: 1.1rem; flex-shrink: 0; margin-top: 2px;">🔍</span>
+    <p style="margin: 0; font-size: 0.88rem; color: #3d5166; line-height: 1.65;">
+      <strong>About this tool —</strong> An estimation tool that uses population density as a coarse
+      proxy for compact urban form and the factors that reduce driving (vehicle kilometres travelled).
+      Not intended to replace more accurate transport models — designed for rapid, low-effort estimates.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+
+    <div style="background: #ffffff; border-radius: 10px; padding: 0.9rem 1rem;
+                border: 1px solid #d8e2ec; border-left: 3px solid #378ADD;">
+      <p style="margin: 0 0 4px; font-size: 0.75rem; text-transform: uppercase;
+                letter-spacing: 0.5px; color: #5a7a95; font-weight: 600;">Time horizon</p>
+      <p style="margin: 0; font-size: 0.85rem; color: #3d5166; line-height: 1.6;">
+        Maximum window of <strong>30 years</strong>. Estimates carry expected uncertainty of
+        <strong>± 20%</strong>.
+      </p>
+    </div>
+
+    <div style="background: #ffffff; border-radius: 10px; padding: 0.9rem 1rem;
+                border: 1px solid #d8e2ec; border-left: 3px solid #EF9F27;">
+      <p style="margin: 0 0 4px; font-size: 0.75rem; text-transform: uppercase;
+                letter-spacing: 0.5px; color: #5a7a95; font-weight: 600;">Atypical cities</p>
+      <p style="margin: 0; font-size: 0.85rem; color: #3d5166; line-height: 1.6;">
+        Uncertainty is higher for cities uncharacteristic of their country — e.g. New York vs U.S. norms.
+      </p>
+    </div>
+
+    <div style="background: #ffffff; border-radius: 10px; padding: 0.9rem 1rem;
+                border: 1px solid #d8e2ec; border-left: 3px solid #1D9E75;">
+      <p style="margin: 0 0 4px; font-size: 0.75rem; text-transform: uppercase;
+                letter-spacing: 0.5px; color: #5a7a95; font-weight: 600;">What density captures</p>
+      <p style="margin: 0; font-size: 0.85rem; color: #3d5166; line-height: 1.6;">
+        Reflects changes from <strong>reduced trip length</strong> and <strong>modal shift</strong>
+        toward non-driving alternatives.
+      </p>
+    </div>
+
+    <div style="background: #ffffff; border-radius: 10px; padding: 0.9rem 1rem;
+                border: 1px solid #d8e2ec; border-left: 3px solid #D85A30;">
+      <p style="margin: 0 0 4px; font-size: 0.75rem; text-transform: uppercase;
+                letter-spacing: 0.5px; color: #5a7a95; font-weight: 600;">What the model omits</p>
+      <p style="margin: 0; font-size: 0.85rem; color: #3d5166; line-height: 1.6;">
+        Wealth, car ownership, and road funding are excluded. Results reflect compact form
+        <em>all else being equal</em>.
+      </p>
+    </div>
+
+  </div>
+
+  <p style="font-size: 0.78rem; color: #7a8fa0; margin: 0.6rem 0 0; text-align: center;">
+    For factors influencing driving, see Appendix R1 &nbsp;·&nbsp;
+    Full methodology in a forthcoming journal article
+  </p>
+
 </div>
 """, unsafe_allow_html=True)
 
