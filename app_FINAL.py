@@ -1,3 +1,4 @@
+-*- coding: utf-8 -*-
 """
 VKT to Emissions Web Tool — Streamlit App (FINAL v4 — DENSITY MODEL + PER-CAPITA FOCUS)
 All model parameters loaded from JSON files exported by aligned pipeline.
